@@ -5,27 +5,32 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 public class RSA {
+    private static BigInteger big256 = new BigInteger("256");
+    private static BigInteger big0 = new BigInteger("0");
 
     // Converts a nonnegative integer* to an octet string of specified length.
     // Takes as input nonnegative integer* x and octet length k.
-    private static byte[] i2osp(long x, int xLen) throws Exception {
-	if ( x >= Math.pow(256, xLen) ) {
+    // RFC 3447 4.1
+    private static byte[] i2osp(BigInteger x, int xLen) throws Exception {
+	if ( x.compareTo(big256.pow(xLen)) >= 0 ) {
 	    throw new Exception("integer too large.");
 	}
 	byte[] output = new byte[xLen];
 	for ( int i = xLen-1; i >= 0; i-- ) {
-	    output[i] = ((byte) (x % 256));
-	    x /= 256;
+	    byte coefficient = x.mod(big256).byteValue();
+	    output[i] = coefficient;
+	    x = x.divide(big256);
 	}
 	return output;
     }
 
     // Converts an octet string to a nonnegative integer*.
     // RFC 3447 4.2
-    private static long os2ip(byte[] string) {
-	long output = 0;
+    private static BigInteger os2ip(byte[] string) {
+	BigInteger output = big0;
 	for ( int i = 0; i < string.length; i++ ) {
-	    output += ((int) string[i]) * Math.pow(256, string.length-i-1);
+	    BigInteger term = BigInteger.valueOf((long) string[i]).multiply(big256.pow(string.length-i-1));
+	    output = output.add(term);
 	}
 	return output;
     }
@@ -59,7 +64,19 @@ public class RSA {
     public static void main(String[] args) throws Exception {
 	System.out.println(Long.MAX_VALUE);
 	//String inputString = "hello my";
-	String inputString = "hell";
+	String inputString = "hello there, my name is calvin vuong. there is something perhaps wrong with this? idk dude.";
+	System.out.println(inputString);
+	byte[] input = inputString.getBytes();
+	System.out.println(input.length);
+	BigInteger encoded = os2ip(input);
+	System.out.println(encoded);
+	byte[] decoded = i2osp(encoded, input.length);
+	System.out.println(new String(decoded));
+	System.out.println(big0);
+	//System.out.println(Arrays.toString(input));
+	//System.out.println(Arrays.toString(decoded));
+
+	/*
 	byte[] input = inputString.getBytes();
 	System.out.println(Arrays.toString(input));
 	long encoded = os2ip(input);
@@ -67,10 +84,35 @@ public class RSA {
 	//String decoded = new String(i2osp(encoded, inputString.length()+3));
 	byte[] decoded = i2osp(encoded, 7);//inputString.length());
 	System.out.println(Arrays.toString(decoded));
-	
+	*/
 	//System.out.println(mod_exponent(2, 3, 7));
 	//System.out.println(mod2(new BigInteger("2"), new BigInteger("3"), new BigInteger("7")));
 	
     }
-	    
+
+
+    
+
+    /* Primitive data type versions */
+    private static long os2ipXXX(byte[] string) {
+	long output = 0;
+	for ( int i = 0; i < string.length; i++ ) {
+	    output += ((int) string[i]) * Math.pow(256, string.length-i-1);
+	}
+	return output;
+    }
+
+    private static byte[] i2ospXXX(long x, int xLen) throws Exception {
+	if ( x >= Math.pow(256, xLen) ) {
+	    throw new Exception("integer too large.");
+	}
+	byte[] output = new byte[xLen];
+	for ( int i = xLen-1; i >= 0; i-- ) {
+	    output[i] = ((byte) (x % 256));
+	    x /= 256;
+	}
+	return output;
+    }
+
+
 }

@@ -41,7 +41,18 @@ public class RSAKeyGen {
     }
 
     public static void main(String[] args) {
-	generateRSAKey(2048);
+	RSAKeyPair keyPair = generateRSAKey(2048);
+
+	RSAPublicKey publicK = keyPair.getPublicKey();
+	RSAPrivateKey privateK = keyPair.getPrivateKey();
+
+	/*
+	System.out.println(publicK.getModulus());
+	System.out.println(publicK.getE());
+	System.out.println();
+	System.out.println(privateK.getModulus());
+	System.out.println(privateK.getD());
+	*/
     }
 
 
@@ -61,7 +72,7 @@ class RSAKeyPair {
 	this.d = d;
 
 	publicKey = new RSAPublicKey(modulus, e);
-	privateKey = new RSAPrivateKey(d);
+	privateKey = new RSAPrivateKey(modulus, d);
     }
 
     public RSAPublicKey getPublicKey() {
@@ -73,33 +84,39 @@ class RSAKeyPair {
     }
 }
 
-class RSAPublicKey {
-    private BigInteger modulus;
-    private BigInteger e;
+class RSAKey {
+    protected BigInteger modulus;
+    protected BigInteger exponent;
 
-    public RSAPublicKey(BigInteger n, BigInteger e) {
-	this.modulus = n;
-	this.e = e;
+    public RSAKey(BigInteger n, BigInteger exp) {
+	modulus = n;
+	exponent = exp;
     }
 
     public BigInteger getModulus() {
 	return modulus;
     }
+    
 
+}
+class RSAPublicKey extends RSAKey {
+
+    public RSAPublicKey(BigInteger n, BigInteger e) {
+	super(n, e);
+    }
+	
     public BigInteger getE() {
-	return e;
+	return exponent;
     }
 }
 
-class RSAPrivateKey {
-    private BigInteger d;
-
-    public RSAPrivateKey(BigInteger d) {
-	this.d = d;
+class RSAPrivateKey extends RSAKey {
+    // modulus not strictly required, but still good to have
+    public RSAPrivateKey(BigInteger n, BigInteger d) {
+	super(n, d);
     }
-
     public BigInteger getD() {
-	return d;
+	return exponent;
     }
 }
     

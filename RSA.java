@@ -2,9 +2,33 @@
 // Implements the RSA algorithm
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class RSA {
-    
+
+    // Converts a nonnegative integer* to an octet string of specified length.
+    // Takes as input nonnegative integer* x and octet length k.
+    private static byte[] i2osp(long x, int xLen) throws Exception {
+	if ( x >= Math.pow(256, xLen) ) {
+	    throw new Exception("integer too large.");
+	}
+	byte[] output = new byte[xLen];
+	for ( int i = xLen-1; i >= 0; i-- ) {
+	    output[i] = ((byte) (x % 256));
+	    x /= 256;
+	}
+	return output;
+    }
+
+    // Converts an octet string to a nonnegative integer*.
+    // RFC 3447 4.2
+    private static long os2ip(byte[] string) {
+	long output = 0;
+	for ( int i = 0; i < string.length; i++ ) {
+	    output += ((int) string[i]) * Math.pow(256, string.length-i-1);
+	}
+	return output;
+    }
 
     // Implements modular exponentiation (efficiently)
     // Returns b^e mod m
@@ -32,8 +56,19 @@ public class RSA {
 	return c;
     }
     */
-    public static void main(String[] args) {
-	System.out.println(mod_exponent(2, 3, 7));
+    public static void main(String[] args) throws Exception {
+	System.out.println(Long.MAX_VALUE);
+	//String inputString = "hello my";
+	String inputString = "hell";
+	byte[] input = inputString.getBytes();
+	System.out.println(Arrays.toString(input));
+	long encoded = os2ip(input);
+	System.out.println(encoded);
+	//String decoded = new String(i2osp(encoded, inputString.length()+3));
+	byte[] decoded = i2osp(encoded, 7);//inputString.length());
+	System.out.println(Arrays.toString(decoded));
+	
+	//System.out.println(mod_exponent(2, 3, 7));
 	//System.out.println(mod2(new BigInteger("2"), new BigInteger("3"), new BigInteger("7")));
 	
     }

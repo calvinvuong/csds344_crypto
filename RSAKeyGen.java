@@ -44,7 +44,6 @@ public class RSAKeyGen {
 	BigInteger d = e.modInverse(L);
 
 	return new RSAKeyPair(n, e, d);
-	//return new RSAKeyPair(new BigInteger("77"), new BigInteger("17"), new BigInteger("53"));
     }
 
     public static void main(String[] args) {

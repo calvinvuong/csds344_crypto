@@ -13,9 +13,14 @@ public class RSAKeyGen {
     // Returns an RSAKeyPair
     // Takes as input k, the bit-length of modulus
     public static RSAKeyPair generateRSAKey(int k) {
-	Random rng = new Random();
+	Random rng = new Random(12345);
+	//Random rng = new Random();
 	// Find prime numbers p and q
 	BigInteger p, q, n;
+	//p = BigInteger.probablePrime(k/2, rng);
+	//q = BigInteger.probablePrime(k/2, rng);
+	//n = p.multiply(q);
+	
 	do {
 	    do {
 		p = BigInteger.probablePrime(k/2, rng);
@@ -27,17 +32,19 @@ public class RSAKeyGen {
 	    // Calculate n = p*q
 	    n = p.multiply(q);
 	} while ( n.bitLength() != k );
-
+	
 	// Calculate key values.
 	
 	// Uses the Charmichael function instead of the totient function
 	BigInteger pMinus1 = p.subtract(big1);
-	BigInteger qMinus1 = p.subtract(big1);
+	BigInteger qMinus1 = q.subtract(big1);
 	BigInteger L = pMinus1.multiply(qMinus1).divide(pMinus1.gcd(qMinus1));
+	//BigInteger L = pMinus1.multiply(qMinus1);
 
 	BigInteger d = e.modInverse(L);
 
 	return new RSAKeyPair(n, e, d);
+	//return new RSAKeyPair(new BigInteger("77"), new BigInteger("17"), new BigInteger("53"));
     }
 
     public static void main(String[] args) {

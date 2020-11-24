@@ -46,6 +46,17 @@ public class RSAKeyGen {
 	RSAPublicKey publicK = keyPair.getPublicKey();
 	RSAPrivateKey privateK = keyPair.getPrivateKey();
 
+	BigInteger m = new BigInteger("78");
+	System.out.println(m);
+	System.out.println();
+	//BigInteger c = m.modPow(publicK.getExponent(), publicK.getModulus());
+	BigInteger c = m.modPow(new BigInteger("17"), new BigInteger("77"));
+	System.out.println(c);
+	System.out.println();
+	//BigInteger m2 = c.modPow(privateK.getExponent(), privateK.getModulus());
+	BigInteger m2 = c.modPow(new BigInteger("53"), new BigInteger("77"));
+	System.out.println(m2);
+	
 	/*
 	System.out.println(publicK.getModulus());
 	System.out.println(publicK.getE());
@@ -96,7 +107,10 @@ class RSAKey {
     public BigInteger getModulus() {
 	return modulus;
     }
-    
+
+    public BigInteger getExponent() {
+	return exponent;
+    }
 
 }
 class RSAPublicKey extends RSAKey {
@@ -106,7 +120,7 @@ class RSAPublicKey extends RSAKey {
     }
 	
     public BigInteger getE() {
-	return exponent;
+	return getExponent();
     }
 }
 
@@ -116,7 +130,7 @@ class RSAPrivateKey extends RSAKey {
 	super(n, d);
     }
     public BigInteger getD() {
-	return exponent;
+	return getExponent();
     }
 }
     

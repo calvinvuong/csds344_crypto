@@ -13,8 +13,8 @@ public class RSAKeyGen {
     // Returns an RSAKeyPair
     // Takes as input k, the bit-length of modulus
     public static RSAKeyPair generateRSAKey(int k) {
-	Random rng = new Random(12345);
-	//Random rng = new Random();
+	//Random rng = new Random(12345);
+	Random rng = new Random();
 	// Find prime numbers p and q
 	BigInteger p, q, n;
 	//p = BigInteger.probablePrime(k/2, rng);
@@ -26,7 +26,7 @@ public class RSAKeyGen {
 		p = BigInteger.probablePrime(k/2, rng);
 	    } while ( p.mod(e).compareTo(big1) == 0 );	
 	    do {
-		q = BigInteger.probablePrime(k/2, rng);
+		q = BigInteger.probablePrime(k - k/2, rng);
 	    } while ( q.mod(e).compareTo(big1) == 0 );
 
 	    // Calculate n = p*q

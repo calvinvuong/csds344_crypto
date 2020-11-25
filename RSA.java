@@ -9,7 +9,7 @@ import java.util.Random;
 public class RSA {
     // NOTE: For the current padding scheme to work, BLOCK_SIZE must be no more than 256 bytes.
     private static final int BLOCK_SIZE = 256; // in bytes
-    private static final int KEY_LEN = 2048; // in bits
+    private static final int KEY_LEN = 2049; // in bits
     
     private static BigInteger big256 = new BigInteger("256");
     private static BigInteger big0 = new BigInteger("0");
@@ -36,10 +36,12 @@ public class RSA {
     // Converts an octet string to a nonnegative integer*.
     // Input strLen is the size of the octet string in byte array string
     // RFC 3447 4.2
-    private static BigInteger os2ip(byte[] string, int strLen) {
+    //private static BigInteger os2ip(byte[] string, int strLen) {
+    private static BigInteger os2ip(byte[] string) {
 	BigInteger output = big0;
-	for ( int i = 0; i < strLen; i++ ) {
-	    BigInteger term = BigInteger.valueOf(Byte.toUnsignedInt(string[i])).multiply(big256.pow(strLen-i-1));
+	for ( int i = 0; i < string.length; i++ ) {
+	    //BigInteger term = BigInteger.valueOf(Byte.toUnsignedInt(string[i])).multiply(big256.pow(strLen-i-1));
+	    BigInteger term = BigInteger.valueOf(Byte.toUnsignedInt(string[i])).multiply(big256.pow(string.length-i-1));
 	    output = output.add(term);
 	}
 	return output;
@@ -52,16 +54,19 @@ public class RSA {
     private static byte[] cryptBlock(byte[] block, int strLen, RSAKey key) throws Exception {
 	
 	// Convert octet string block to integer.
-	System.out.println(Arrays.toString(block));
-	BigInteger m = os2ip(block, strLen);
+	//System.out.println(Arrays.toString(block));
+	//BigInteger m = os2ip(block, strLen);
+	BigInteger m = os2ip(block);
 	//System.out.println(m);
-	System.out.println();
+	//System.out.println(m.compareTo(key.getModulus()));
+	//System.out.println();
 	// Perform modular exonentiation (efficiently).
 	BigInteger c = m.modPow(key.getExponent(), key.getModulus());
 	//System.out.println(c);
-	System.out.println();
+	//System.out.println();
 	
-	byte[] cryptedBlock = i2osp(c, KEY_LEN/8);
+	//byte[] cryptedBlock = i2osp(c, KEY_LEN/8);
+	byte[] cryptedBlock = i2osp(c, strLen);
 	return cryptedBlock;
 	
     }
@@ -69,7 +74,7 @@ public class RSA {
     // Fills the last padBytes bytes in block with padBytes.
     // padBytes < 256
     private static void padBlock(byte[] block, int padBytes) {
-	System.out.println("PADDING ACTIVATED.");
+	//System.out.println("PADDING ACTIVATED.");
 	for ( int i = block.length - padBytes; i < block.length; i++ ) {
 	    block[i] = (byte) padBytes;
 	}
@@ -83,14 +88,14 @@ public class RSA {
 
     // Returns block, trimmed of any padding bytes
     private static byte[] trimPadding(byte[] block) {
-	System.out.println("TRIMMING ACTIVATED.");
+	//System.out.println("TRIMMING ACTIVATED.");
 	// Last byte in block tells length of pad
 	int last = Byte.toUnsignedInt(block[block.length-1]);
 	if ( last == 0 ) {
 	    return new byte[0];
 	}
 	byte[] trimmed = new byte[block.length-last];
-	System.out.println(trimmed.length);
+	//System.out.println(trimmed.length);
 	for ( int i = 0; i < trimmed.length; i++ )
 	    trimmed[i] = block[i];
 	return trimmed;
@@ -111,16 +116,18 @@ public class RSA {
 		padBlock(blockBuf, blockSize-bytesRead);
 		padded = true;
 	    }
+	    //System.out.println(Arrays.toString(blockBuf));
+	    //blockBuf[0] = 3;
 	    // encrypt or decrypt
-	    byte[] cryptedBlock = cryptBlock(blockBuf, blockSize, key);
+	    byte[] cryptedBlock = cryptBlock(blockBuf, blockSize+1, key);
 	    // Write crypted block to output file
-	    System.out.println(Arrays.toString(cryptedBlock));
+	    //System.out.println(Arrays.toString(cryptedBlock));
 	    writer.write(cryptedBlock, 0, cryptedBlock.length);
 	    // read next block from the file
 	    bytesRead = reader.read(blockBuf, 0, blockSize);
 	}
 	if ( ! padded ) {
-	    byte[] cryptedBlock = cryptBlock( padZero(blockSize), blockSize, key );
+	    byte[] cryptedBlock = cryptBlock( padZero(blockSize+1), blockSize+1, key );
 	    writer.write( cryptedBlock, 0, cryptedBlock.length );
 	}
 	  
@@ -140,14 +147,15 @@ public class RSA {
 	BigInteger m;
 	while ( bytesRead != -1 ) {
 	    // encrypt or decrypt
-	    byte[] cryptedBlock = cryptBlock(blockBuf, bytesRead, key);
+	    //byte[] cryptedBlock = cryptBlock(blockBuf, bytesRead, key);
+	    byte[] cryptedBlock = cryptBlock(blockBuf, blockSize-1, key);
 	    // read next block from the file
 	    bytesRead = reader.read(blockBuf, 0, blockSize);
 	    if ( bytesRead == -1 ) { // current cryptedBlock is the last block (no next block to read)
 		cryptedBlock = trimPadding(cryptedBlock); // trim this block of padding
 	    }
 	    // Write crypted block to output file
-	    System.out.println(Arrays.toString(cryptedBlock));
+	    //System.out.println(Arrays.toString(cryptedBlock));
 	    writer.write(cryptedBlock, 0, cryptedBlock.length);
 		
 	}
@@ -160,69 +168,33 @@ public class RSA {
     
     
     public static void main(String[] args) throws Exception {
+
+	
 	String inputFile = "files/input3.txt";
 	String outputFile = "files/encrypt3.txt";
 	
 	String rInputFile = outputFile;
 	String rOutputFile = "files/decrypt3.txt";
-
+	
+	/*
+	String inputFile = "files/isengard.jpg";
+	String outputFile = "files/isengard_E.jpg";
+	String rInputFile = outputFile;
+	String rOutputFile = "files/isengard_D.jpg";
+	*/
 	// Generate RSA key
 
 	
 	RSAKeyPair key = RSAKeyGen.generateRSAKey(KEY_LEN);
 	RSAPublicKey publicKey = key.getPublicKey();
 	RSAPrivateKey privateKey = key.getPrivateKey();
-	byte[] plaintext = "Hello there. I need a string that is exactly 256 bytes long. Ugh I really wish this were easier. Why am I having so much trouble debugging? I do not like this one bit. I do not like it at all.".getBytes();
-	//System.out.println(plaintext.length);
-
-	/*
-	BigInteger m = os2ip(plaintext, plaintext.length);
-	//BigInteger m = new BigInteger("283923409888938234");
-	System.out.println(m);
-	System.out.println();
-	BigInteger c = crypt(m, publicKey);
-	System.out.println(c);
-	System.out.println();
-	BigInteger m1 = crypt(c, privateKey);
-	System.out.println(m1);
-	*/	
-
-	/* THIS CODE IS GOOD
-	byte[] ciphertext = cryptBlock(plaintext, plaintext.length, publicKey);
-	System.out.println(Arrays.toString(plaintext));
-	System.out.println("Plaintext text length: " + plaintext.length);
 		
-	System.out.println();
-	System.out.println(Arrays.toString(ciphertext));
-	System.out.println("Cipher text length: " + ciphertext.length);
-
-	System.out.println();
-	byte[] decrypttext = cryptBlock(ciphertext, ciphertext.length, privateKey);
-	System.out.println(Arrays.toString(decrypttext));
-	System.out.println("Decrypt text length: " + decrypttext.length);
-	*/
-
 	System.out.println("Encryption");
 	encryptFile(inputFile, BLOCK_SIZE, outputFile, publicKey);
 	System.out.println();
 	System.out.println("Decryption");
-	decryptFile(rInputFile, BLOCK_SIZE, rOutputFile, privateKey);
+	decryptFile(rInputFile, BLOCK_SIZE+1, rOutputFile, privateKey);
 	
-	/*
-	System.out.println(Long.MAX_VALUE);
-	//String inputString = "hello my";
-	String inputString = "hello there, my name is calvin vuong. there is something perhaps wrong with this? idk dude.";
-	System.out.println(inputString);
-	byte[] input = inputString.getBytes();
-	System.out.println(input.length);
-	BigInteger encoded = os2ip(input);
-	System.out.println(encoded);
-	byte[] decoded = i2osp(encoded, input.length);
-	System.out.println(new String(decoded));
-	System.out.println(big0);
-	//System.out.println(Arrays.toString(input));
-	//System.out.println(Arrays.toString(decoded));
-	*/
 	
     }
 

@@ -165,16 +165,23 @@ public class RSA {
     }
 
 
-    
+    // Wrapper functions for encrypt and decrypt file
+    public static void encryptFile(String inputFile, String outputFile, RSAKey publicKey) throws Exception {
+	encryptFile(inputFile, BLOCK_SIZE, outputFile, publicKey);
+    }
+
+    public static void decryptFile(String inputFile, String outputFile, RSAKey privateKey) throws Exception {
+	decryptFile(inputFile, BLOCK_SIZE+1, outputFile, privateKey);
+    }
     
     public static void main(String[] args) throws Exception {
 
 	
-	String inputFile = "files/input3.txt";
-	String outputFile = "files/encrypt3.txt";
+	String inputFile = "files/lecture.pdf";
+	String outputFile = "files/lecture_E.pdf";
 	
 	String rInputFile = outputFile;
-	String rOutputFile = "files/decrypt3.txt";
+	String rOutputFile = "files/lecture_D.pdf";
 	
 	/*
 	String inputFile = "files/isengard.jpg";
@@ -186,14 +193,22 @@ public class RSA {
 
 	
 	RSAKeyPair key = RSAKeyGen.generateRSAKey(KEY_LEN);
-	RSAPublicKey publicKey = key.getPublicKey();
-	RSAPrivateKey privateKey = key.getPrivateKey();
-		
+	RSAPublicKey pubKey = key.getPublicKey();
+	RSAPrivateKey priKey = key.getPrivateKey();
+
+	// Save keys first.
+	RSAKey.saveKey("rsaKey.pub", pubKey);
+	RSAKey.saveKey("rsaKey", priKey);
+
+	// Read keys back.
+	RSAPublicKey publicKey = (RSAPublicKey) RSAKey.loadKey("rsaKey.pub");
+	RSAPrivateKey privateKey = (RSAPrivateKey) RSAKey.loadKey("rsaKey");
+	
 	System.out.println("Encryption");
-	encryptFile(inputFile, BLOCK_SIZE, outputFile, publicKey);
+	encryptFile(inputFile, outputFile, publicKey);
 	System.out.println();
 	System.out.println("Decryption");
-	decryptFile(rInputFile, BLOCK_SIZE+1, rOutputFile, privateKey);
+	decryptFile(rInputFile, rOutputFile, privateKey);
 	
 	
     }

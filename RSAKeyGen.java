@@ -3,6 +3,7 @@
 
 import java.math.BigInteger;
 import java.util.Random;
+import java.io.*;
 
 public class RSAKeyGen {
 
@@ -101,7 +102,7 @@ class RSAKeyPair {
     }
 }
 
-class RSAKey {
+class RSAKey implements Serializable {
     protected BigInteger modulus;
     protected BigInteger exponent;
 
@@ -118,7 +119,32 @@ class RSAKey {
 	return exponent;
     }
 
+    public static void saveKey(String fileName, RSAKey key) {
+	try {
+	    ObjectOutputStream writer = new ObjectOutputStream(new FileOutputStream(fileName));
+	    writer.writeObject(key);
+	    writer.close();
+	}
+	catch (IOException e) {
+	    e.printStackTrace();
+	}
+    }
+
+    public static RSAKey loadKey(String fileName) {
+	try {
+	    ObjectInputStream reader = new ObjectInputStream(new FileInputStream(fileName));
+	    RSAKey key = (RSAKey) reader.readObject();
+	    reader.close();
+	    return key;
+	}
+	catch (Exception e) {
+	    e.printStackTrace();
+	}
+	return null;
+    }
+
 }
+
 class RSAPublicKey extends RSAKey {
 
     public RSAPublicKey(BigInteger n, BigInteger e) {

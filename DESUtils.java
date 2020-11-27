@@ -1,3 +1,5 @@
+package csds344_gui;
+
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ThreadLocalRandom;
 

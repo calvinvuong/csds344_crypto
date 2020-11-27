@@ -1,3 +1,5 @@
+package csds344_gui;
+
 import java.io.*;
 import java.util.*;
 
@@ -187,6 +189,7 @@ public class DESCipher {
     	}
     }
     
+    
     public static void main(String args[]) throws IOException { 
     	/*File inputFile = new File("cal.pdf");
     	InputStream inputStream = new FileInputStream(inputFile);
@@ -205,13 +208,15 @@ public class DESCipher {
     	
     	String key = DESUtils.randomHexKey(); // "AABB09182736CCDD"; //1d89b7bb19d06836
     	//List<String> subkeys = subKeys(key);
-    	
-    	DESCipher.encryptFile(new File("pic.png"), key, "enc/encrypted");
-    	DESCipher.decryptFile(new File("enc/encrypted"), key, "enc/original.png");
+    	//System.out.println("The key is " +key);
+        
+    	//DESCipher.encryptFile(new File("coco.txt"), key, "cocoenc.txt");
+    	//DESCipher.decryptFile(new File("cocoenc.txt"), key, "cocodec.txt");
     	
     	/*String enc = cipher.encrypt("123456ABCD132536", subkeys);
     	System.out.println(enc);
     	System.out.println(cipher.decrypt(enc, subkeys));*/
     	
-    } 
+    }
+    
 }

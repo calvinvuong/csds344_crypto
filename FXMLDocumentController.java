@@ -5,6 +5,11 @@
  */
 package csds344_gui;
 
+import static csds344_gui.RSAKeyGen.generateRSAKey;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.List;
@@ -73,9 +78,6 @@ public class FXMLDocumentController implements Initializable {
         choiceBoxList.add(EncryptionType.RSA);
         choiceBoxList.add(EncryptionType.DES);
         choiceBox.setValue(EncryptionType.VIGNERE);
-        
-        
-        
     }    
     
     @FXML
@@ -85,40 +87,87 @@ public class FXMLDocumentController implements Initializable {
         processLabel.setText(endMessage);
         
         //Below is what we'll probably use
-        String fileName = textFieldFileName.getText();
+        String userFile = textFieldFileName.getText();
+        String key = myTextArea.getText();
         EncryptionType chosen = choiceBox.getValue();
         
+        //File fileName = new File(userFile);
         if(shouldEncrypt){
-           encryptFile(fileName, chosen);
+           encryptFile(userFile, key, chosen);
         }else{
-            decryptFile(fileName, chosen);
+           decryptFile(userFile, key, chosen);
         }
     }
     
-    private void decryptFile(String fileName, EncryptionType type){
+    private void decryptFile(String fileName, String key, EncryptionType type){
         switch(type){
                 case VIGNERE :
-                    //INSERT VIGNERE HERE
+                    VigenereCipher vc = new VigenereCipher("decryptedVIG.png", fileName, key);
+                    vc.execute();
                     break;
                 case RSA :
-                    //INSERT RSA HERE
+                    
+                    try{
+                        RSAPrivateKey privateKey = (RSAPrivateKey) RSAKey.loadKey(key);
+                        RSA.decryptFile(fileName, "decOutputRSA.txt", privateKey);
+                    }catch(Exception e){
+                        
+                    }
+                    
                     break;
                 case DES :
-                    //INSERT DES HERE
+                    try{
+                        DESCipher.decryptFile(new File(fileName), key, "decOutput.txt");
+                    }
+                    catch(FileNotFoundException e) {
+                        processLabel.setText("The file was not found.");
+                    }catch(IOException e){
+                        processLabel.setText("The file was not of the correct type");
+                    }catch(IllegalArgumentException e){
+                        processLabel.setText("The key provided was invalid");
+                    }
                     break;
         }
     }
     
-    private void encryptFile(String fileName, EncryptionType type){
+    private void encryptFile(String fileName, String key, EncryptionType type){
         switch(type){
                 case VIGNERE :
-                    //INSERT VIGNERE HERE
+                    VigenereCipher vc = new VigenereCipher(fileName, "encVIG", key);
+                    vc.execute();
                     break;
                 case RSA :
-                    //INSERT RSA HERE
+                    try{
+                        //Key length must be 2049
+                        int KEY_LEN = 2049; // in bits
+                        RSAKeyPair keyPair = generateRSAKey(KEY_LEN);
+                        RSAPublicKey pubKey = keyPair.getPublicKey();
+                        RSAPrivateKey privKey = keyPair.getPrivateKey();
+                        
+                        // Save keys first.
+                        RSAKey.saveKey("rsaKey.pub", pubKey);
+                        RSAKey.saveKey("rsaKey", privKey);
+                        
+                        System.out.println("keys were saved in rsaKey");
+                        RSA.encryptFile(fileName, "encOutputRSA", pubKey);
+                    }catch(Exception e){
+                        processLabel.setText("File was not found");
+                    }
+                    
                     break;
                 case DES :
-                    //INSERT DES HERE
+                    try{
+                        String key1 = DESUtils.randomHexKey();
+                        System.out.println(key1);
+                        DESCipher.encryptFile(new File(fileName), key1, "encOutputDES");
+                    }
+                    catch(FileNotFoundException e) {
+                        processLabel.setText("The file was not found.");
+                    }catch(IOException e){
+                        processLabel.setText("The file was not of the correct type");
+                    }catch(IllegalArgumentException e){
+                        processLabel.setText("The key provided was invalid");
+                    }
                     break;
         }
     }

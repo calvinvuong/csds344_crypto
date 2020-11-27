@@ -1,3 +1,5 @@
+package csds344_gui;
+
 
 class PermutationTables {
 	

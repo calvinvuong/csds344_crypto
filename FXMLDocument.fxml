@@ -10,7 +10,7 @@
 <AnchorPane id="AnchorPane" prefHeight="437.0" prefWidth="866.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="csds344_gui.FXMLDocumentController">
    <children>
       <Button fx:id="ButtonProcess" layoutX="570.0" layoutY="85.0" mnemonicParsing="false" onAction="#ProcessButonPushed" text="Process" />
-      <Label fx:id="processLabel" layoutX="642.0" layoutY="65.0" prefHeight="217.0" prefWidth="164.0" text="" wrapText="true" />
+      <Label fx:id="processLabel" alignment="CENTER" layoutX="642.0" layoutY="65.0" prefHeight="217.0" prefWidth="164.0" text="" wrapText="true" />
       <VBox layoutX="175.0" layoutY="65.0" prefHeight="89.0" prefWidth="149.0">
          <children>
             <Label fx:id="choiceBoxLabel" text="Type of encryption" />
@@ -27,16 +27,22 @@
       </VBox>
       <VBox layoutX="334.0" layoutY="65.0" prefHeight="266.0" prefWidth="224.0">
          <children>
-            <Label text="Key" />
-            <TextArea fx:id="myTextArea" prefHeight="200.0" prefWidth="200.0" promptText="Enter your key if needed" wrapText="true" />
+            <Label fx:id="keyLabel" text="Key file" />
+            <TextArea fx:id="keyTextArea" prefHeight="200.0" prefWidth="200.0" promptText="Enter the file name" wrapText="true" />
          </children>
       </VBox>
       <VBox layoutX="14.0" layoutY="65.0" prefHeight="200.0" prefWidth="149.0">
          <children>
             <Label text="File Name" />
-            <TextField fx:id="textFieldFileName" promptText="Enter File Name" />
+            <TextField fx:id="textFieldinputFile" promptText="Enter File Name" />
+            <Label text="Output File">
+               <padding>
+                  <Insets top="5.0" />
+               </padding>
+            </Label>
             <VBox prefHeight="89.0" prefWidth="100.0">
                <children>
+                  <TextField fx:id="textFieldOutput" promptText="Enter Output Name" />
                   <RadioButton fx:id="ButtonGroupEncrypt" mnemonicParsing="false" onAction="#radioEncryptPushed" selected="true" text="Encrypt">
                      <toggleGroup>
                         <ToggleGroup fx:id="ButtonGroup" />

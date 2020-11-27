@@ -9,10 +9,10 @@ import static csds344_gui.RSAKeyGen.generateRSAKey;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.List;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,26 +30,12 @@ import javafx.scene.control.ToggleGroup;
  */
 public class FXMLDocumentController implements Initializable {
     private boolean shouldEncrypt = true;
-    
     @FXML
-    private void radioEncryptPushed(ActionEvent event) {
-        shouldEncrypt = true;
-        choiceBoxLabel.setText("Type of encyption");
-    }
-
+    private TextField textFieldOutput;
     @FXML
-    private void radioDecryptPushed(ActionEvent event) {
-        shouldEncrypt = false;
-        choiceBoxLabel.setText("Type of decryption");
-
-    }
-    
-    private enum EncryptionType{
-        VIGNERE,
-        RSA,
-        DES
-    }
-    
+    private Label keyLabel;
+    @FXML
+    private TextArea keyTextArea;
     @FXML
     private Label processLabel;
     @FXML
@@ -59,9 +45,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private RadioButton ButtonGroupDecrypt;
     @FXML
-    private TextArea myTextArea; //Used for key
-    @FXML
-    private TextField textFieldFileName;
+    private TextField textFieldinputFile;
     @FXML
     private Button ButtonProcess;
     @FXML
@@ -69,55 +53,128 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Label choiceBoxLabel; //used for type of encryption
     
+    List<EncryptionType> choiceBoxList;
     
+    @FXML
+    private void radioEncryptPushed(ActionEvent event) {
+        shouldEncrypt = true;
+        choiceBoxLabel.setText("Type of encryption");
+        checkTypeChange();
+    }
+
+    @FXML
+    private void radioDecryptPushed(ActionEvent event) {
+        shouldEncrypt = false;
+        choiceBoxLabel.setText("Type of decryption");
+        checkTypeChange();
+    }
+
+    private void choiceBoxSelected(EncryptionType type) {   
+        switch(type){
+            case VIGNERE:
+                keyLabel.setText("Key file");
+                keyTextArea.setText("");
+                keyTextArea.setPromptText("Enter the file name");
+                break;
+            case RSA:
+                if(shouldEncrypt){
+                    keyLabel.setText("Keys will found in");
+                    keyTextArea.setText("Private: rsaKey \nPublic: rsaKey.pub");
+                    //keyTextArea.setText("Public: rsaKey.pub");
+                }else{
+                    keyLabel.setText("Private Key File");
+                    keyTextArea.setText("");
+                    keyTextArea.setPromptText("Enter the file name");
+                }
+                break;
+            case DES:
+                if(shouldEncrypt){
+                    keyLabel.setText("Key will be generated below");
+                    keyTextArea.setText("");
+                    keyTextArea.setPromptText("After encrypting, your key will be here");
+                }else{
+                    keyLabel.setText("Key");
+                    keyTextArea.setText("");
+
+                    keyTextArea.setPromptText("Enter the hexadecimal key");
+                }
+                break;
+            
+        }
+    }
+    
+    private enum EncryptionType{
+        VIGNERE,
+        RSA,
+        DES
+    }
+    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {        
         //These items are for configuring the choicebox
-        List<EncryptionType> choiceBoxList = choiceBox.getItems();
+        choiceBoxList = choiceBox.getItems();
         choiceBoxList.add(EncryptionType.VIGNERE);
         choiceBoxList.add(EncryptionType.RSA);
         choiceBoxList.add(EncryptionType.DES);
         choiceBox.setValue(EncryptionType.VIGNERE);
-    }    
+        
+        
+        choiceBox.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            choiceBoxSelected(choiceBoxList.get(newValue.intValue()));
+        });
+    }
+    
+    private void checkTypeChange(){
+        Integer index = choiceBox.getSelectionModel().selectedIndexProperty().getValue();
+        choiceBoxSelected(choiceBoxList.get(index));
+    }
     
     @FXML
     private void ProcessButonPushed(ActionEvent event) {
-        String endMessage = textFieldFileName.getText() + " has been processed using " + choiceBox.getValue() +". Your key was " + myTextArea.getText();
+        if(textFieldinputFile == null || textFieldOutput == null ){
+            processLabel.setText("Please input a valid input and output file name");
+            return;
+        }
+        
+        
+        String endMessage = textFieldinputFile.getText() + " has been processed";
         
         processLabel.setText(endMessage);
         
         //Below is what we'll probably use
-        String userFile = textFieldFileName.getText();
-        String key = myTextArea.getText();
+        String userFile = textFieldinputFile.getText();
+        String outputFile = textFieldOutput.getText();
+        String key = keyTextArea.getText();
         EncryptionType chosen = choiceBox.getValue();
         
-        //File fileName = new File(userFile);
+        //File inputFile = new File(userFile);
         if(shouldEncrypt){
-           encryptFile(userFile, key, chosen);
+           encryptFile(userFile, outputFile, key, chosen);
         }else{
-           decryptFile(userFile, key, chosen);
+           decryptFile(userFile, outputFile, key, chosen);
         }
     }
     
-    private void decryptFile(String fileName, String key, EncryptionType type){
+    private void decryptFile(String inputFile, String outputFile, String key, EncryptionType type){
         switch(type){
                 case VIGNERE :
-                    VigenereCipher vc = new VigenereCipher("decryptedVIG.png", fileName, key);
+                    VigenereCipher vc = new VigenereCipher(outputFile, inputFile, key);
                     vc.execute();
                     break;
                 case RSA :
                     
                     try{
                         RSAPrivateKey privateKey = (RSAPrivateKey) RSAKey.loadKey(key);
-                        RSA.decryptFile(fileName, "decOutputRSA.txt", privateKey);
+                        RSA.decryptFile(inputFile, outputFile, privateKey);
                     }catch(Exception e){
-                        
+                        processLabel.setText("Please check the inputs");
                     }
                     
                     break;
                 case DES :
                     try{
-                        DESCipher.decryptFile(new File(fileName), key, "decOutput.txt");
+                        DESCipher.decryptFile(new File(inputFile), key, outputFile);
                     }
                     catch(FileNotFoundException e) {
                         processLabel.setText("The file was not found.");
@@ -130,10 +187,10 @@ public class FXMLDocumentController implements Initializable {
         }
     }
     
-    private void encryptFile(String fileName, String key, EncryptionType type){
+    private void encryptFile(String inputFile, String outputFile, String key, EncryptionType type){
         switch(type){
                 case VIGNERE :
-                    VigenereCipher vc = new VigenereCipher(fileName, "encVIG", key);
+                    VigenereCipher vc = new VigenereCipher(inputFile, outputFile, key);
                     vc.execute();
                     break;
                 case RSA :
@@ -149,9 +206,9 @@ public class FXMLDocumentController implements Initializable {
                         RSAKey.saveKey("rsaKey", privKey);
                         
                         System.out.println("keys were saved in rsaKey");
-                        RSA.encryptFile(fileName, "encOutputRSA", pubKey);
+                        RSA.encryptFile(inputFile, outputFile, pubKey);
                     }catch(Exception e){
-                        processLabel.setText("File was not found");
+                        processLabel.setText("Please check the inputs");
                     }
                     
                     break;
@@ -159,7 +216,8 @@ public class FXMLDocumentController implements Initializable {
                     try{
                         String key1 = DESUtils.randomHexKey();
                         System.out.println(key1);
-                        DESCipher.encryptFile(new File(fileName), key1, "encOutputDES");
+                        DESCipher.encryptFile(new File(inputFile), key1, outputFile);
+                        keyTextArea.setText(key1);
                     }
                     catch(FileNotFoundException e) {
                         processLabel.setText("The file was not found.");

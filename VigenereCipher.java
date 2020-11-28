@@ -1,8 +1,6 @@
 package csds344_gui;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +14,8 @@ import java.nio.file.Path;
 public class VigenereCipher {
 
     String plaintextFileName, keyFileName, ciphertextFileName;
-    String plaintext = null, key = null, ciphertext = null;
+    byte[] plaintext = null, key = null, ciphertext = null;
+    Path plaintextFile = null, ciphertextFile = null;
 
     int operation; // 0 = encrypt, 1 = decrypt
 
@@ -30,21 +29,21 @@ public class VigenereCipher {
         this.plaintextFileName = plaintextFileName;
         this.ciphertextFileName = ciphertextFileName;
         this.keyFileName = keyFileName;
-
+        plaintextFile = FileSystems.getDefault().getPath(".", plaintextFileName);
+        ciphertextFile = FileSystems.getDefault().getPath(".", ciphertextFileName);
+        Path keyFile = FileSystems.getDefault().getPath(".", keyFileName);
         boolean noPlain = false, noCipher = false;
 
-        Path plaintextFile = FileSystems.getDefault().getPath(".", plaintextFileName);
-        Path ciphertextFile = FileSystems.getDefault().getPath(".", ciphertextFileName);
-        Path keyFile = FileSystems.getDefault().getPath(".", keyFileName);
         try {
-            this.plaintext = new String(Files.readAllBytes(plaintextFile)).trim();
+            this.plaintext = Files.readAllBytes(plaintextFile);
             operation = 0;
         } catch (IOException ioe) {
             System.out.println("No plaintext found, trying ciphertext...");
             noPlain = true;
         }
         try {
-            this.ciphertext = new String(Files.readAllBytes(ciphertextFile)).trim();
+            this.ciphertext = Files.readAllBytes(ciphertextFile);
+            plaintext = new byte[ciphertext.length];
             operation = 1;
         } catch (IOException ioe) {
             if (noPlain) {
@@ -52,9 +51,10 @@ public class VigenereCipher {
                 System.exit(1);
             }
             System.out.println("Plaintext ok but no ciphertext found...I will create one for you");
+            ciphertext = new byte[plaintext.length];
         }
         try {
-            this.key = new String(Files.readAllBytes(keyFile)).trim();
+            this.key = Files.readAllBytes(keyFile);
         } catch (IOException ioe) {
             System.out.println("Key not found! Cannot continue without a key and either a plaintext or a ciphertext");
             System.exit(1);
@@ -67,29 +67,28 @@ public class VigenereCipher {
      */
     public void encrypt() {
         boolean decrypt = (operation == 1) ? true : false;
-        String inputtext = (decrypt) ? ciphertext : plaintext;
-        String outputtext = (decrypt) ? plaintext : ciphertext;
+        byte[] inputtext = (decrypt) ? ciphertext : plaintext;
+        byte[] outputtext = (decrypt) ? plaintext : ciphertext;
         int kp = 0, ip; //keypointer and input pointer
         byte k, i, o; //current byte at key, input and output
-        int keyLength = key.length(), offset = 10;
-        StringBuilder outputtextBuilder = new StringBuilder();
-        for (ip = 0; ip < inputtext.length(); ip++) {
+        int keyLength = key.length, offset = 10;
+        for (ip = 0; ip < inputtext.length; ip++) {
             // Convert chars from a = 97 to a = 0.
-            i = (byte) (inputtext.charAt(ip) - 'a');
-            k = (byte) (key.charAt(kp) - 'a');
-            o = (byte) ((decrypt) ? (i - k) : (i + k) % 26);
+            i = inputtext[ip];
+            k = key[kp];
+            o = (byte) ((decrypt) ? (i - k) : (i + k) % 256);
             // Make sure we apply modulo 26 even if the result is negative
-            if (o < 0) {
-                o = (byte) (26 + (i - k));
-            }
-            o = (byte) (o + 'a');  // Revert back to Unicode space to print actual characters
-            outputtextBuilder.append((char) o);
+           /* if (o < 0) {
+                o = (byte) (256 + (i - k));
+            }*/
+
+            outputtext[ip] = o;
             kp = (kp + 1) % keyLength;
         }
         if (decrypt) {
-            this.plaintext = outputtextBuilder.toString();
+            this.plaintext = outputtext;
         } else {
-            this.ciphertext = outputtextBuilder.toString();
+            this.ciphertext = outputtext;
         }
     }
 
@@ -97,18 +96,13 @@ public class VigenereCipher {
      * Write files to the given paths.
      */
     public void writeFiles() {
-        PrintWriter ciphertextWriter = null, plaintextWriter = null;
         try {
-            ciphertextWriter = new PrintWriter(ciphertextFileName);
-            plaintextWriter = new PrintWriter(plaintextFileName);
-        } catch (FileNotFoundException fnfe) {
+            Files.write(ciphertextFile,ciphertext);
+            Files.write(plaintextFile,plaintext);
+        } catch (IOException ioe) {
             System.out.println("One or more files not found");
             System.exit(1);
         }
-        ciphertextWriter.print(ciphertext);
-        plaintextWriter.print(plaintext);
-        ciphertextWriter.close();
-        plaintextWriter.close();
     }
 
     /**
@@ -127,6 +121,7 @@ public class VigenereCipher {
 
     @Override
     public String toString() {
-        return "Plaintext -> " + plaintext + "\nCiphertext -> " + ciphertext + "\nKey -> " + key;
+
+        return "Plaintext -> " + new String(plaintext) + "\nCiphertext -> " + new String(ciphertext) + "\nKey -> " + new String(key);
     }
 }

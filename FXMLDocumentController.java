@@ -126,8 +126,12 @@ public class FXMLDocumentController implements Initializable {
     }
     
     private void checkTypeChange(){
+        choiceBoxSelected(currentEncryptionType());
+    }
+    
+    private EncryptionType currentEncryptionType(){
         Integer index = choiceBox.getSelectionModel().selectedIndexProperty().getValue();
-        choiceBoxSelected(choiceBoxList.get(index));
+        return choiceBoxList.get(index);
     }
     
     @FXML
@@ -137,6 +141,12 @@ public class FXMLDocumentController implements Initializable {
             return;
         }
         
+        if(currentEncryptionType().equals(EncryptionType.VIGNERE)){
+            if(keyTextArea == null){
+                processLabel.setText("Please input the name of your key file");
+                return;
+            }
+        }
         
         String endMessage = textFieldinputFile.getText() + " has been processed";
         
@@ -148,7 +158,6 @@ public class FXMLDocumentController implements Initializable {
         String key = keyTextArea.getText();
         EncryptionType chosen = choiceBox.getValue();
         
-        //File inputFile = new File(userFile);
         if(shouldEncrypt){
            encryptFile(userFile, outputFile, key, chosen);
         }else{
@@ -184,6 +193,8 @@ public class FXMLDocumentController implements Initializable {
                         processLabel.setText("The key provided was invalid");
                     }
                     break;
+                default:
+                    break;
         }
     }
     
@@ -205,7 +216,6 @@ public class FXMLDocumentController implements Initializable {
                         RSAKey.saveKey("rsaKey.pub", pubKey);
                         RSAKey.saveKey("rsaKey", privKey);
                         
-                        System.out.println("keys were saved in rsaKey");
                         RSA.encryptFile(inputFile, outputFile, pubKey);
                     }catch(Exception e){
                         processLabel.setText("Please check the inputs");
@@ -214,10 +224,9 @@ public class FXMLDocumentController implements Initializable {
                     break;
                 case DES :
                     try{
-                        String key1 = DESUtils.randomHexKey();
-                        System.out.println(key1);
-                        DESCipher.encryptFile(new File(inputFile), key1, outputFile);
-                        keyTextArea.setText(key1);
+                        String keyGenerated = DESUtils.randomHexKey();
+                        DESCipher.encryptFile(new File(inputFile), keyGenerated, outputFile);
+                        keyTextArea.setText(keyGenerated);
                     }
                     catch(FileNotFoundException e) {
                         processLabel.setText("The file was not found.");
@@ -226,6 +235,8 @@ public class FXMLDocumentController implements Initializable {
                     }catch(IllegalArgumentException e){
                         processLabel.setText("The key provided was invalid");
                     }
+                    break;
+                default:
                     break;
         }
     }

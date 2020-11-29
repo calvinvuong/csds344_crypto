@@ -42,7 +42,6 @@ public class RSA {
     private static BigInteger os2ip(byte[] string) {
 	BigInteger output = big0;
 	for ( int i = 0; i < string.length; i++ ) {
-	    //BigInteger term = BigInteger.valueOf(Byte.toUnsignedInt(string[i])).multiply(big256.pow(strLen-i-1));
 	    BigInteger term = BigInteger.valueOf(Byte.toUnsignedInt(string[i])).multiply(big256.pow(string.length-i-1));
 	    output = output.add(term);
 	}
@@ -54,20 +53,11 @@ public class RSA {
     // Key (n, e or d) given by RSAKey key.
     // The only difference between encrypting and decrypting is the key it is given.
     private static byte[] cryptBlock(byte[] block, int strLen, RSAKey key) throws Exception {
-	
-	// Convert octet string block to integer.
-	//System.out.println(Arrays.toString(block));
-	//BigInteger m = os2ip(block, strLen);
+
 	BigInteger m = os2ip(block);
-	//System.out.println(m);
-	//System.out.println(m.compareTo(key.getModulus()));
-	//System.out.println();
-	// Perform modular exonentiation (efficiently).
+	// Perform modular exonentiation.
 	BigInteger c = m.modPow(key.getExponent(), key.getModulus());
-	//System.out.println(c);
-	//System.out.println();
-	
-	//byte[] cryptedBlock = i2osp(c, KEY_LEN/8);
+
 	byte[] cryptedBlock = i2osp(c, strLen);
 	return cryptedBlock;
 	
@@ -90,7 +80,6 @@ public class RSA {
 
     // Returns block, trimmed of any padding bytes
     private static byte[] trimPadding(byte[] block) {
-	//System.out.println("TRIMMING ACTIVATED.");
 	// Last byte in block tells length of pad
 	int last = Byte.toUnsignedInt(block[block.length-1]);
 	if ( last == 0 ) {
@@ -118,12 +107,9 @@ public class RSA {
 		padBlock(blockBuf, blockSize-bytesRead);
 		padded = true;
 	    }
-	    //System.out.println(Arrays.toString(blockBuf));
-	    //blockBuf[0] = 3;
 	    // encrypt or decrypt
 	    byte[] cryptedBlock = cryptBlock(blockBuf, blockSize+1, key);
 	    // Write crypted block to output file
-	    //System.out.println(Arrays.toString(cryptedBlock));
 	    writer.write(cryptedBlock, 0, cryptedBlock.length);
 	    // read next block from the file
 	    bytesRead = reader.read(blockBuf, 0, blockSize);
@@ -149,7 +135,6 @@ public class RSA {
 	BigInteger m;
 	while ( bytesRead != -1 ) {
 	    // encrypt or decrypt
-	    //byte[] cryptedBlock = cryptBlock(blockBuf, bytesRead, key);
 	    byte[] cryptedBlock = cryptBlock(blockBuf, blockSize-1, key);
 	    // read next block from the file
 	    bytesRead = reader.read(blockBuf, 0, blockSize);
@@ -157,7 +142,6 @@ public class RSA {
 		cryptedBlock = trimPadding(cryptedBlock); // trim this block of padding
 	    }
 	    // Write crypted block to output file
-	    //System.out.println(Arrays.toString(cryptedBlock));
 	    writer.write(cryptedBlock, 0, cryptedBlock.length);
 		
 	}
@@ -176,25 +160,24 @@ public class RSA {
 	decryptFile(inputFile, BLOCK_SIZE+1, outputFile, privateKey);
     }
     
-    /*
     public static void main(String[] args) throws Exception {
 
-	
+	/*
 	String inputFile = "files/lecture.pdf";
 	String outputFile = "files/lecture_E.pdf";
 	
 	String rInputFile = outputFile;
 	String rOutputFile = "files/lecture_D.pdf";
 	*/
-	/*
+	
 	String inputFile = "files/isengard.jpg";
 	String outputFile = "files/isengard_E.jpg";
 	String rInputFile = outputFile;
 	String rOutputFile = "files/isengard_D.jpg";
-	*/
+	
 	// Generate RSA key
 
-	/*
+	
 	RSAKeyPair key = RSAKeyGen.generateRSAKey(KEY_LEN);
 	RSAPublicKey pubKey = key.getPublicKey();
 	RSAPrivateKey priKey = key.getPrivateKey();
@@ -212,9 +195,9 @@ public class RSA {
 	System.out.println();
 	System.out.println("Decryption");
 	decryptFile(rInputFile, rOutputFile, privateKey);
-	*/
 	
-    //}
+	
+    }
 
 
     

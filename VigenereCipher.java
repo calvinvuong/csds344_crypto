@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * This is an implementation of the VigenereCipher cipher.
@@ -29,9 +30,26 @@ public class VigenereCipher {
         this.plaintextFileName = plaintextFileName;
         this.ciphertextFileName = ciphertextFileName;
         this.keyFileName = keyFileName;
-        plaintextFile = FileSystems.getDefault().getPath(".", plaintextFileName);
-        ciphertextFile = FileSystems.getDefault().getPath(".", ciphertextFileName);
-        Path keyFile = FileSystems.getDefault().getPath(".", keyFileName);
+        
+        if(plaintextFileName.contains(":")){
+            plaintextFile = Paths.get(plaintextFileName);
+        }else{
+            plaintextFile = FileSystems.getDefault().getPath(".", plaintextFileName);
+        }
+        
+        if(ciphertextFileName.contains(":")){
+            ciphertextFile = Paths.get(ciphertextFileName);
+        }else{
+            ciphertextFile = FileSystems.getDefault().getPath(".", ciphertextFileName);
+        }
+        Path keyFile;
+        
+        if(keyFileName.contains(":")){
+            keyFile = Paths.get(keyFileName);
+        }else{
+            keyFile = FileSystems.getDefault().getPath(".", keyFileName);
+        }
+        
         boolean noPlain = false, noCipher = false;
 
         try {

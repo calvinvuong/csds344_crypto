@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package csds344_gui;
 
 import static csds344_gui.RSAKeyGen.generateRSAKey;
@@ -18,11 +13,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.stage.FileChooser;
 
 /**
  *
@@ -54,6 +51,10 @@ public class FXMLDocumentController implements Initializable {
     private Label choiceBoxLabel; //used for type of encryption
     
     List<EncryptionType> choiceBoxList;
+    @FXML
+    private Hyperlink inputBrowser;
+    @FXML
+    private Hyperlink keyBrowser;
     
     @FXML
     private void radioEncryptPushed(ActionEvent event) {
@@ -75,6 +76,7 @@ public class FXMLDocumentController implements Initializable {
                 keyLabel.setText("Key file");
                 keyTextArea.setText("");
                 keyTextArea.setPromptText("Enter the file name");
+                keyBrowser.setManaged(true);
                 break;
             case RSA:
                 if(shouldEncrypt){
@@ -85,6 +87,7 @@ public class FXMLDocumentController implements Initializable {
                     keyLabel.setText("Private Key File");
                     keyTextArea.setText("");
                     keyTextArea.setPromptText("Enter the file name");
+                    keyBrowser.setManaged(true);
                 }
                 break;
             case DES:
@@ -95,11 +98,35 @@ public class FXMLDocumentController implements Initializable {
                 }else{
                     keyLabel.setText("Key");
                     keyTextArea.setText("");
-
                     keyTextArea.setPromptText("Enter the hexadecimal key");
+                    keyBrowser.setManaged(false);
                 }
                 break;
             
+        }
+    }
+
+    @FXML
+    private void inputBrowserPushed(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        File selectedFile = fc.showOpenDialog(null);
+        
+        if(selectedFile != null){
+            textFieldinputFile.setText(selectedFile.getAbsolutePath());
+        }else{
+            processLabel.setText("Please choose an input file");
+        }
+    }
+
+    @FXML
+    private void keyBrowserPushed(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        File selectedFile = fc.showOpenDialog(null);
+        
+        if(selectedFile != null){
+            keyTextArea.setText(selectedFile.getAbsolutePath());
+        }else{
+            processLabel.setText("Please choose a valid key file");
         }
     }
     
@@ -170,6 +197,17 @@ public class FXMLDocumentController implements Initializable {
                 case VIGNERE :
                     VigenereCipher vc = new VigenereCipher(outputFile, inputFile, key);
                     vc.execute();
+                    /*
+                    String[] vigArgs = new String[3];
+                    vigArgs[0] = inputFile;
+                    vigArgs[1] = outputFile;
+                    vigArgs[2] = key;
+                    try{
+                        Vigenere.main(vigArgs);
+                    }catch(IOException e){
+                        processLabel.setText("Please check the input");
+                    }
+                    */
                     break;
                 case RSA :
                     
@@ -203,6 +241,7 @@ public class FXMLDocumentController implements Initializable {
                 case VIGNERE :
                     VigenereCipher vc = new VigenereCipher(inputFile, outputFile, key);
                     vc.execute();
+                    
                     break;
                 case RSA :
                     try{

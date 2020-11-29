@@ -25,16 +25,18 @@
             </ChoiceBox>
          </children>
       </VBox>
-      <VBox layoutX="334.0" layoutY="65.0" prefHeight="266.0" prefWidth="224.0">
+      <VBox layoutX="334.0" layoutY="65.0" prefHeight="267.0" prefWidth="224.0">
          <children>
             <Label fx:id="keyLabel" text="Key file" />
-            <TextArea fx:id="keyTextArea" prefHeight="200.0" prefWidth="200.0" promptText="Enter the file name" wrapText="true" />
+            <TextArea fx:id="keyTextArea" prefHeight="206.0" prefWidth="224.0" promptText="Enter the file name" wrapText="true" />
+            <Hyperlink fx:id="keyBrowser" onAction="#keyBrowserPushed" text="Browse" />
          </children>
       </VBox>
       <VBox layoutX="14.0" layoutY="65.0" prefHeight="200.0" prefWidth="149.0">
          <children>
             <Label text="File Name" />
             <TextField fx:id="textFieldinputFile" promptText="Enter File Name" />
+            <Hyperlink fx:id="inputBrowser" onAction="#inputBrowserPushed" text="Browse" />
             <Label text="Output File">
                <padding>
                   <Insets top="5.0" />

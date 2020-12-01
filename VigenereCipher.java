@@ -26,7 +26,7 @@ public class VigenereCipher {
      * If both plaintext and ciphertext are present decryption is performed.
      * Key is necessary.
      */
-    VigenereCipher(String plaintextFileName, String ciphertextFileName, String keyFileName) {
+    VigenereCipher(String plaintextFileName, String ciphertextFileName, String keyFileName) throws IOException {
         this.plaintextFileName = plaintextFileName;
         this.ciphertextFileName = ciphertextFileName;
         this.keyFileName = keyFileName;
@@ -51,12 +51,11 @@ public class VigenereCipher {
         }
         
         boolean noPlain = false, noCipher = false;
-
         try {
             this.plaintext = Files.readAllBytes(plaintextFile);
             operation = 0;
         } catch (IOException ioe) {
-            System.out.println("No plaintext found, trying ciphertext...");
+            //System.out.println("No plaintext found, trying ciphertext...");
             noPlain = true;
         }
         try {
@@ -65,18 +64,26 @@ public class VigenereCipher {
             operation = 1;
         } catch (IOException ioe) {
             if (noPlain) {
-                System.out.println("You haven't provided a valid ciphertext nor a valid plaintext. Exiting...");
-                System.exit(1);
+                //System.out.println("You haven't provided a valid ciphertext nor a valid plaintext. Exiting...");
+                //System.exit(1);
             }
-            System.out.println("Plaintext ok but no ciphertext found...I will create one for you");
-            ciphertext = new byte[plaintext.length];
+            //System.out.println("Plaintext ok but no ciphertext found...I will create one for you");
+            
+            if(plaintext != null){
+                ciphertext = new byte[plaintext.length];
+            }else{
+                throw new IOException();
+            }
+            
+            
+            
         }
-        try {
+        //try {
             this.key = Files.readAllBytes(keyFile);
-        } catch (IOException ioe) {
-            System.out.println("Key not found! Cannot continue without a key and either a plaintext or a ciphertext");
-            System.exit(1);
-        }
+        //} catch (IOException ioe) {
+            //System.out.println("Key not found! Cannot continue without a key and either a plaintext or a ciphertext");
+            //System.exit(1);
+        //}
     }
 
     /**
@@ -118,7 +125,7 @@ public class VigenereCipher {
             Files.write(ciphertextFile,ciphertext);
             Files.write(plaintextFile,plaintext);
         } catch (IOException ioe) {
-            System.out.println("One or more files not found");
+            //System.out.println("One or more files not found");
             System.exit(1);
         }
     }
@@ -128,10 +135,10 @@ public class VigenereCipher {
      */
     public void execute() {
         if (operation == 0) {
-            System.out.println("Encrypting...");
+            //System.out.println("Encrypting...");
         }
         if (operation == 1) {
-            System.out.println("Decrypting...");
+            //System.out.println("Decrypting...");
         }
         encrypt();
         writeFiles();

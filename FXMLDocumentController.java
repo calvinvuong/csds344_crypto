@@ -195,8 +195,13 @@ public class FXMLDocumentController implements Initializable {
     private void decryptFile(String inputFile, String outputFile, String key, EncryptionType type){
         switch(type){
                 case VIGNERE :
-                    VigenereCipher vc = new VigenereCipher(outputFile, inputFile, key);
-                    vc.execute();
+                    try{
+                        VigenereCipher vc = new VigenereCipher(outputFile, inputFile, key);
+                        vc.execute();
+                    }catch(IOException e){
+                        processLabel.setText("Please check the inputs");
+                    }
+                    
                     /*
                     String[] vigArgs = new String[3];
                     vigArgs[0] = inputFile;
@@ -239,8 +244,14 @@ public class FXMLDocumentController implements Initializable {
     private void encryptFile(String inputFile, String outputFile, String key, EncryptionType type){
         switch(type){
                 case VIGNERE :
-                    VigenereCipher vc = new VigenereCipher(inputFile, outputFile, key);
-                    vc.execute();
+                   try{
+                       VigenereCipher vc = new VigenereCipher(inputFile, outputFile, key);
+                       vc.execute();
+                    }catch(IOException e){
+                        processLabel.setText("Please check the inputs");
+                    }
+                    
+                   
                     
                     break;
                 case RSA :

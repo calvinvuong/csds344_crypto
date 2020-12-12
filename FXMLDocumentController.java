@@ -79,7 +79,7 @@ public class FXMLDocumentController implements Initializable {
     
     private void choiceBoxSelected(EncryptionType type) {   
         switch(type){
-            case VIGNERE:
+            case VIGENERE:
                 keyLabel.setText("Key file");
                 keyTextArea.setText("");
                 keyTextArea.setPromptText("Enter the file name");
@@ -137,7 +137,7 @@ public class FXMLDocumentController implements Initializable {
     }
     
     private enum EncryptionType{
-        VIGNERE,
+        VIGENERE,
         RSA,
         DES
     }
@@ -147,10 +147,10 @@ public class FXMLDocumentController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {        
         //These items are for configuring the choicebox
         choiceBoxList = choiceBox.getItems();
-        choiceBoxList.add(EncryptionType.VIGNERE);
+        choiceBoxList.add(EncryptionType.VIGENERE);
         choiceBoxList.add(EncryptionType.RSA);
         choiceBoxList.add(EncryptionType.DES);
-        choiceBox.setValue(EncryptionType.VIGNERE);
+        choiceBox.setValue(EncryptionType.VIGENERE);
         
         
         choiceBox.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -174,7 +174,7 @@ public class FXMLDocumentController implements Initializable {
             return;
         }
         
-        if(currentEncryptionType().equals(EncryptionType.VIGNERE)){
+        if(currentEncryptionType().equals(EncryptionType.VIGENERE)){
             if(keyTextArea == null){
                 processLabel.setText("Please input the name of your key file");
                 return;
@@ -203,7 +203,7 @@ public class FXMLDocumentController implements Initializable {
     
     private void decryptFile(String inputFile, String outputFile, String key, EncryptionType type){
         switch(type){
-                case VIGNERE :
+                case VIGENERE :
                     try{
                         VigenereCipher vc = new VigenereCipher(outputFile, inputFile, key);
                         vc.execute();
@@ -240,7 +240,7 @@ public class FXMLDocumentController implements Initializable {
     
     private void encryptFile(String inputFile, String outputFile, String key, EncryptionType type){
         switch(type){
-                case VIGNERE :
+                case VIGENERE :
                    try{
                        VigenereCipher vc = new VigenereCipher(inputFile, outputFile, key);
                        vc.execute();

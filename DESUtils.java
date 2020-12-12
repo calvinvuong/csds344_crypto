@@ -12,11 +12,6 @@ public class DESUtils {
         String binaryString = Long.toBinaryString(Long.parseUnsignedLong(hexString, 16));
         
         return stringWithLeadingZeros(binaryString, numberOfBits - binaryString.length());
-        
-        /*while (binaryString.length() < numberOfBits) 
-        	binaryString = "0" + binaryString;
-      
-        return binaryString;*/
     }
 
     static String binaryToHex(String binString) { 
@@ -24,10 +19,6 @@ public class DESUtils {
         String hexString = Long.toHexString(Long.parseUnsignedLong(binString, 2));
         
         return stringWithLeadingZeros(hexString, numberOfHex - hexString.length());
-                
-        /*while (hexString.length() < numberOfHex) 
-        	hexString = "0" + hexString; 
-        return hexString;*/
     } 
     
     // Applies sequence permutation

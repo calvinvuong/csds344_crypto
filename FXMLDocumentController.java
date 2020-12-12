@@ -70,6 +70,13 @@ public class FXMLDocumentController implements Initializable {
         checkTypeChange();
     }
 
+    long startTime = System.nanoTime();
+    
+    private void printDuration(){
+        long duration = System.nanoTime() - startTime;
+        System.out.println("The duration of this method was "+duration);
+    }
+    
     private void choiceBoxSelected(EncryptionType type) {   
         switch(type){
             case VIGNERE:
@@ -82,7 +89,6 @@ public class FXMLDocumentController implements Initializable {
                 if(shouldEncrypt){
                     keyLabel.setText("Keys will found in");
                     keyTextArea.setText("Private: rsaKey \nPublic: rsaKey.pub");
-                    //keyTextArea.setText("Public: rsaKey.pub");
                 }else{
                     keyLabel.setText("Private Key File");
                     keyTextArea.setText("");
@@ -179,17 +185,20 @@ public class FXMLDocumentController implements Initializable {
         
         processLabel.setText(endMessage);
         
-        //Below is what we'll probably use
         String userFile = textFieldinputFile.getText();
         String outputFile = textFieldOutput.getText();
         String key = keyTextArea.getText();
         EncryptionType chosen = choiceBox.getValue();
+        
+        startTime = System.nanoTime();
         
         if(shouldEncrypt){
            encryptFile(userFile, outputFile, key, chosen);
         }else{
            decryptFile(userFile, outputFile, key, chosen);
         }
+        
+        //printDuration();
     }
     
     private void decryptFile(String inputFile, String outputFile, String key, EncryptionType type){
@@ -201,18 +210,6 @@ public class FXMLDocumentController implements Initializable {
                     }catch(IOException e){
                         processLabel.setText("Please check the inputs");
                     }
-                    
-                    /*
-                    String[] vigArgs = new String[3];
-                    vigArgs[0] = inputFile;
-                    vigArgs[1] = outputFile;
-                    vigArgs[2] = key;
-                    try{
-                        Vigenere.main(vigArgs);
-                    }catch(IOException e){
-                        processLabel.setText("Please check the input");
-                    }
-                    */
                     break;
                 case RSA :
                     

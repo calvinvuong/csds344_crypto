@@ -26,7 +26,7 @@ class PermutationTables {
 			                  26, 33, 1, 41, 9, 49, 
 			                  17, 57, 25 }; 
 
-    // First key-hePermutation Table 
+    // First key-Permutation Table 
     static final int[] PC1 = {57, 49, 41, 33, 25, 
 			                  17, 9, 1, 58, 50, 42, 34, 26, 
 			                  18, 10, 2, 59, 51, 43, 35, 27, 
@@ -96,6 +96,7 @@ class PermutationTables {
           { 2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11 } } 
     }; 
     
+    // Number of shifts when generating subkeys
     static final int[] NUM_SHIFTS = { 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 }; 
 
 }

@@ -99,9 +99,9 @@ public class DESCipher {
     	// Apply IP permutation
     	String cipherText = DESUtils.permutedHexString(PermutationTables.IP, plainText);
     	
-    	// Go through 16 rounds of f function
+    	// Go through 16 Feistel rounds
     	for (int i = 0; i < 16; i++)
-    		cipherText = fFunction(cipherText, subkeys.get(i)); 
+    		cipherText = feistelRound(cipherText, subkeys.get(i)); 
     	
     	// Swap left and right
     	cipherText = cipherText.substring(8, 16) + cipherText.substring(0, 8);
@@ -117,7 +117,7 @@ public class DESCipher {
         
         // Go through 16 rounds of f function in reverse 
         for (int i = 16; i > 0; i--)
-            plainText = fFunction(plainText, subkeys.get(i - 1));
+            plainText = feistelRound(plainText, subkeys.get(i - 1));
 
         // Swap left and right
         plainText = plainText.substring(8, 16) + plainText.substring(0, 8); 
@@ -125,7 +125,7 @@ public class DESCipher {
         return DESUtils.permutedHexString(PermutationTables.IP1, plainText); 
     }
     
-    private static String fFunction(String cipherText, String subkey) { 
+    private static String feistelRound(String cipherText, String subkey) { 
     	
         // Split previous result into left and right 
         String prevLeft = cipherText.substring(0, 8); 
@@ -186,32 +186,4 @@ public class DESCipher {
     		outputStream.write(DESUtils.hexToBytes(s));	
     	}
     }
-    
-    public static void main(String args[]) throws IOException { 
-    	/*File inputFile = new File("cal.pdf");
-    	InputStream inputStream = new FileInputStream(inputFile);
-    	byte[] inputBytes = new byte[(int) inputFile.length()];
-    	inputStream.read(inputBytes);
-    	
-    	for (byte b : inputBytes) {
-            String st = String.format("%02X", b);
-            System.out.println(st);
-        }
-    	String st = String.format("%02X", -2); System.out.print(st);
-    	System.out.println(inputBytes);
-    	
-    	FileOutputStream out = new FileOutputStream(new File("l.txt"));
-    	out.write(inputBytes);*/
-    	
-    	String key = DESUtils.randomHexKey(); // "AABB09182736CCDD"; //1d89b7bb19d06836
-    	//List<String> subkeys = subKeys(key);
-    	
-    	DESCipher.encryptFile(new File("pic.png"), key, "enc/encrypted");
-    	DESCipher.decryptFile(new File("enc/encrypted"), key, "enc/original.png");
-    	
-    	/*String enc = cipher.encrypt("123456ABCD132536", subkeys);
-    	System.out.println(enc);
-    	System.out.println(cipher.decrypt(enc, subkeys));*/
-    	
-    } 
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="437.0" prefWidth="866.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="csds344_gui.FXMLDocumentController">
+   <children>
+      <Button fx:id="ButtonProcess" layoutX="570.0" layoutY="85.0" mnemonicParsing="false" onAction="#ProcessButonPushed" text="Process" />
+      <Label fx:id="processLabel" alignment="CENTER" layoutX="642.0" layoutY="65.0" prefHeight="217.0" prefWidth="164.0" text="" wrapText="true" />
+      <VBox layoutX="175.0" layoutY="65.0" prefHeight="89.0" prefWidth="149.0">
+         <children>
+            <Label fx:id="choiceBoxLabel" text="Type of encryption" />
+            <ChoiceBox fx:id="choiceBox" prefWidth="150.0">
+               <contextMenu>
+                  <ContextMenu>
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Unspecified Action" />
+                    </items>
+                  </ContextMenu>
+               </contextMenu>
+            </ChoiceBox>
+         </children>
+      </VBox>
+      <VBox layoutX="334.0" layoutY="65.0" prefHeight="267.0" prefWidth="224.0">
+         <children>
+            <Label fx:id="keyLabel" text="Key file" />
+            <TextArea fx:id="keyTextArea" prefHeight="206.0" prefWidth="224.0" promptText="Enter the file name" wrapText="true" />
+            <Hyperlink fx:id="keyBrowser" onAction="#keyBrowserPushed" text="Browse" />
+         </children>
+      </VBox>
+      <VBox layoutX="14.0" layoutY="65.0" prefHeight="200.0" prefWidth="149.0">
+         <children>
+            <Label text="File Name" />
+            <TextField fx:id="textFieldinputFile" promptText="Enter File Name" />
+            <Hyperlink fx:id="inputBrowser" onAction="#inputBrowserPushed" text="Browse" />
+            <Label text="Output File">
+               <padding>
+                  <Insets top="5.0" />
+               </padding>
+            </Label>
+            <VBox prefHeight="89.0" prefWidth="100.0">
+               <children>
+                  <TextField fx:id="textFieldOutput" promptText="Enter Output Name" />
+                  <RadioButton fx:id="ButtonGroupEncrypt" mnemonicParsing="false" onAction="#radioEncryptPushed" selected="true" text="Encrypt">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="ButtonGroup" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="ButtonGroupDecrypt" mnemonicParsing="false" onAction="#radioDecryptPushed" text="Decrypt" toggleGroup="$ButtonGroup" />
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

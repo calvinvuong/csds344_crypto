@@ -17,6 +17,6 @@ This option may not work due to built in OS anti-virus protections. (Students ar
 
 ## Build (Option 2)
 1. Install or make sure you have javaFX (java 11 was the first build to not have it built in)
-2. Enter the folder csds344_gui exists
+2. Enter the folder csds344_gui
 3. Compile and run CSDS344_GUI.java
 

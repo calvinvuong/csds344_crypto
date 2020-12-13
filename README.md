@@ -13,10 +13,10 @@
 
 ## Build (Option 1)
 Execute CSDS344_GUI.jar
-This option may not work due to built in OS anti-virus protections. (Students are untrusted publishers)
+This option may not work due due to OS reasons
 
 ## Build (Option 2)
-1. Install or make sure you have javaFX (java 11 was the first build to not have it built in)
+1. Install or make sure you have javaFX (greater than java 10 may need to download separately)
 2. Enter the folder csds344_gui
 3. Compile and run CSDS344_GUI.java
 

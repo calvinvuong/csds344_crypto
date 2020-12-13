@@ -13,7 +13,7 @@
 
 ## Build (Option 1)
 Execute CSDS344_GUI.jar
-This option may not work due due to OS reasons
+(This option may not work due due to OS reasons)
 
 ## Build (Option 2)
 1. Install or make sure you have javaFX (greater than java 10 may need to download separately)
